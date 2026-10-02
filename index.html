@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>CartPad · every coin has a cart</title>
+<meta name="description" content="Launch a pump.fun coin with an AI shopper. Its creator fees fill a cart, the model shops real stores on its own, buys one real thing and ships it to a holder.">
+<meta name="theme-color" content="#C8D4E0">
+<meta property="og:title" content="CartPad · every coin has a cart">
+<meta property="og:description" content="Fees fill the cart. The model shops real stores on its own. One holder gets what it buys.">
+<meta property="og:image" content="og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+/* Same paper as the web it shops: blue-grey page, mono everywhere, underlined links, one black button.
+   Hero = a text cart with eyes, the platform cart shopping live, then every coin as a live window. */
+:root{
+  --bg:#C8D4E0;
+  --ink:#0D1014;
+  --mute:#5F6E7E;
+  --mute2:#2E3946;
+  --panel:#D2DCE6;
+  --line:rgba(13,16,20,.45);
+  --line2:rgba(13,16,20,.16);
+  --live:#13733A;
+  --blue:#2F5D8C;
+  --rust:#9A5426;
+  --coral:#D97757;
+  --red:#B42318;
+  --paper:#E7EDF3;
+  --f:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --f-art:ui-monospace,"SF Mono",Menlo,Consolas,"DejaVu Sans Mono","Liberation Mono",monospace;
+  --f-web:"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  --gut:23px;
+  --top-h:46px;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth;scroll-padding-top:calc(var(--top-h) + 10px);overflow-x:clip}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 13px/1.55 var(--f);letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:clip}
+[hidden]{display:none!important}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}
+a:hover{text-decoration-thickness:2px}
+a[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+button{font:inherit;color:inherit;letter-spacing:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.mute{color:var(--mute)}
+.demo{display:inline-block;font-size:10px;font-weight:500;letter-spacing:.84px;text-transform:uppercase;color:var(--mute);border:1px dashed rgba(13,16,20,.42);padding:0 6px;line-height:17px;vertical-align:1px;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:30px;padding:5px 12px;background:var(--ink);color:var(--paper);font-weight:600;font-size:13px;text-decoration:none;border:0;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#000;text-decoration:none}
+.btn[aria-disabled="true"]{opacity:1;background:#2b3138;color:#AFBCCA}
+.wrap{max-width:1720px;margin:0 auto;padding:0 var(--gut)}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{height:var(--top-h);display:flex;align-items:center;gap:26px}
+.mark{font-weight:700;font-size:14px;text-decoration:none;letter-spacing:-.02em}
+.nav{display:flex;align-items:center;gap:7px;font-size:13.5px;white-space:nowrap}
+.nav i{font-style:normal;color:var(--mute)}
+.top .btn{margin-left:auto}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);grid-template-rows:auto 1fr;grid-template-areas:"top pane" "feeds pane";column-gap:44px;row-gap:28px;padding:20px 0 34px}
+.h-top{grid-area:top;display:grid;grid-template-columns:auto minmax(0,1fr);gap:34px;align-items:start}
+.art{margin:0;font-family:var(--f-art);font-size:11.5px;line-height:1.18;letter-spacing:0;color:var(--ink);white-space:pre;user-select:none}
+.a-r{color:var(--rust)}
+.a-b{color:var(--blue)}
+.a-k{color:var(--ink)}
+.art .flip{color:var(--coral);font-weight:700}
+.h-copy{max-width:470px;padding-top:1px}
+.tag{font-size:12px;color:var(--mute2)}
+.h1{margin:16px 0 0;font-size:16px;font-weight:600;line-height:1.55;letter-spacing:-.015em}
+.h1 i{font-style:normal;font-weight:400;color:var(--mute);padding:0 3px}
+.desc{margin:16px 0 0;color:var(--mute2);font-size:13px}
+.stats{margin:14px 0 0;color:var(--mute);font-size:12px}
+.feeds{grid-area:feeds;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-self:start}
+.feeds h2{margin:0 0 8px;font-size:13px;font-weight:700}
+.feed{list-style:none;margin:0;padding:0;font-size:12px;line-height:20px}
+.feed li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed a{font-weight:500;margin-right:6px}
+
+/* live pane */
+.pane{grid-area:pane;margin:0;min-width:0}
+.win{border:1px solid var(--line)}
+.win-bar{display:flex;align-items:center;gap:10px;height:29px;padding:0 10px;border-bottom:1px solid var(--line);font-size:12px;white-space:nowrap}
+.live-dot{display:inline-flex;align-items:center;gap:6px;color:var(--live);font-weight:600}
+.live-dot i,.c-live i{width:7px;height:7px;border-radius:50%;background:var(--live);box-shadow:0 0 0 2px rgba(19,115,58,.18);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 4px rgba(19,115,58,0)}}
+.win-t{font-weight:600}
+.win-url{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;color:var(--mute2)}
+.browser{position:relative;aspect-ratio:16/10;overflow:hidden;background:#fff;container-type:inline-size}
+.page{position:absolute;inset:0;overflow:hidden;font-family:var(--f-web);font-size:clamp(7px,2.15cqw,13px);line-height:1.35;color:#111;letter-spacing:0;background:#fff;--acc:#222;--on:#fff}
+.pane figcaption{margin-top:10px}
+.thought{display:block;min-height:3.1em;font-size:13px;line-height:1.55;color:var(--ink)}
+.thought::after{content:"▍";color:var(--blue);margin-left:1px;animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.cap{display:block;margin-top:2px;font-size:12px;color:var(--mute)}
+#cursor{position:absolute;left:0;top:0;width:18px;height:22px;z-index:6;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35))}
+.ring{position:absolute;left:0;top:0;width:28px;height:28px;margin:-14px 0 0 -14px;border:2px solid var(--blue);border-radius:50%;opacity:0;z-index:5;pointer-events:none}
+.ring.go{animation:ring .55s ease-out}
+@keyframes ring{0%{opacity:.9;transform:scale(.3)}100%{opacity:0;transform:scale(1.25)}}
+
+/* the fake web: search engine */
+.lite{padding:1.5em 2em}
+.lite-head{display:flex;align-items:center;gap:.8em}
+.lite-head b{font-size:1.25em;letter-spacing:-.02em;color:#2F5D8C}
+.lite-box{flex:1;display:flex;align-items:center;min-height:2.3em;padding:0 .7em;border:1px solid #9aa3ad;font-size:1em;color:#111;white-space:nowrap;overflow:hidden}
+.caret{display:inline-block;width:1px;height:1.1em;background:#111;margin-left:1px;animation:caret 1s steps(1) infinite}
+.lite-go{padding:.5em 1em;border:1px solid #9aa3ad;background:#eef1f4}
+.lite-empty{margin:2.2em 0 0;color:#8a8f96}
+.r{margin-top:1.15em;max-width:44em}
+.r a{display:block;color:#1a0dab;text-decoration:underline;font-size:1.08em}
+.r-url{display:block;color:#0b6b2c;font-size:.88em;margin-top:.15em}
+.r-snip{display:block;color:#555;font-size:.88em;margin-top:.15em}
+/* the fake web: stores */
+.s-head{display:flex;align-items:center;gap:1.2em;padding:.75em 1.5em;border-bottom:1px solid #e6e6e6}
+.s-head b{font-size:1.15em;font-weight:800;color:var(--acc);letter-spacing:-.02em}
+.s-nav{color:#777;font-size:.86em}
+.s-cart{margin-left:auto;border:1px solid #d9d9d9;padding:.3em .8em;border-radius:2em;font-size:.86em}
+.s-cart i{font-style:normal;font-weight:700}
+.s-prod{display:grid;grid-template-columns:42% minmax(0,1fr);gap:1.6em;padding:1.4em 1.6em}
+.s-img{aspect-ratio:1;background:#f3f3f3;overflow:hidden}
+.s-img img{width:100%;height:100%;object-fit:cover}
+.s-info{display:flex;flex-direction:column;align-items:flex-start;gap:.45em;min-width:0}
+.s-crumb{color:#8a8a8a;font-size:.8em}
+.s-info h4{margin:0;font-size:1.32em;line-height:1.2;font-weight:700}
+.s-rate{color:#b07b00;font-size:.85em}
+.s-price{font-size:1.65em;font-weight:800;letter-spacing:-.01em}
+.s-ship{color:#2e7d32;font-size:.85em}
+.s-btns{display:flex;gap:.6em;margin-top:.5em}
+.s-add,.s-check{background:var(--acc);color:var(--on);padding:.65em 1.15em;border-radius:.3em;font-weight:700}
+.s-add.is-added{background:#2e7d32;color:#fff}
+.s-buy{border:1px solid #cfcfcf;padding:.65em 1.15em;border-radius:.3em}
+.s-cartpage,.s-co{padding:1.3em 1.6em}
+.s-cartpage h4,.s-co h4,.s-done h4{margin:0 0 .7em;font-size:1.3em}
+.s-line{display:grid;grid-template-columns:4.2em minmax(0,1fr) auto;gap:1em;align-items:center;padding:.7em 0;border-top:1px solid #eee;border-bottom:1px solid #eee}
+.s-line img{width:4.2em;height:4.2em;object-fit:cover;background:#f3f3f3}
+.s-line small{display:block;color:#888;margin-top:.2em}
+.s-sum{display:flex;flex-direction:column;align-items:flex-end;gap:.3em;margin-top:1em}
+.s-sum .tot{font-size:1.15em}
+.s-check{margin-top:.55em;padding:.7em 1.8em}
+.s-pay{display:flex;gap:.6em;margin:.2em 0 .9em}
+.opt{border:1px solid #cfcfcf;padding:.45em .85em;border-radius:.3em;color:#666}
+.opt.on{border-color:#111;color:#111;font-weight:700}
+.s-row{display:flex;justify-content:space-between;gap:1em;padding:.5em 0;border-bottom:1px solid #eee}
+.s-row span{color:#777}
+.s-place{display:inline-block;margin-top:1em;background:#111;color:#fff;padding:.7em 1.8em;border-radius:.3em;font-weight:700}
+.s-done{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:.35em;padding:3.2em 2em}
+.s-done h4{margin:.3em 0 .1em}
+.s-done .mute{color:#888}
+.tick{width:2.4em;height:2.4em;border-radius:50%;background:#2e7d32;color:#fff;display:grid;place-items:center;font-size:1.4em}
+/* the draw overlay */
+.draw{position:absolute;inset:0;z-index:4;display:grid;place-items:center;background:rgba(13,16,20,.94);color:#C8D4E0;font-family:var(--f);letter-spacing:-.01em}
+.d-in{text-align:center;width:min(86%,360px)}
+.d-k{display:block;font-size:11px;letter-spacing:.84px;text-transform:uppercase;color:#9FB0C2}
+.d-slot{display:block;margin:.5em 0 1.1em;font-size:11px;color:#7D8FA3;line-height:1.5}
+.d-reel{position:relative;height:84px;overflow:hidden;font-size:15px;border-top:1px solid rgba(200,212,224,.2);border-bottom:1px solid rgba(200,212,224,.2)}
+.d-reel::after{content:"";position:absolute;left:0;right:0;top:28px;height:28px;border-top:1px solid rgba(19,115,58,.9);border-bottom:1px solid rgba(19,115,58,.9);background:rgba(19,115,58,.16);pointer-events:none}
+.d-reel ul{list-style:none;margin:0;padding:28px 0 0}
+.d-reel li{height:28px;line-height:28px;color:#6F8195}
+.d-reel li.win{color:#fff;font-weight:600}
+
+/* sections */
+.sec{border-top:1px solid var(--line);padding:24px 0 36px}
+.s-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0;font-size:13.5px;font-weight:700}
+.s-h .mute{font-weight:400}
+.sub{margin:6px 0 16px;max-width:76ch;color:var(--mute2)}
+
+/* explore */
+.ex-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0}
+.ex-bar .grow{flex:1}
+.seg{display:inline-flex;border:1px solid var(--line);max-width:100%}
+.seg button{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;min-height:28px;background:transparent;border:0;border-left:1px solid var(--line);color:var(--mute2);font-size:12px;cursor:pointer;white-space:nowrap}
+.seg button:first-child{border-left:0}
+.seg button:hover{background:rgba(13,16,20,.06)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);font-weight:600}
+.seg button span{color:var(--mute);font-weight:400}
+.seg button[aria-pressed="true"] span{color:#8FA0B3}
+.seg button i{font-style:normal}
+.dot{display:none;width:6px;height:6px;background:#2FBF71}
+[aria-pressed="true"] .dot{display:inline-block}
+.search{display:flex;align-items:center;gap:7px;min-height:30px;padding:0 9px;border:1px solid var(--line);width:280px;max-width:100%}
+.search svg{flex:none;color:var(--mute)}
+.search input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:12.5px;color:var(--ink);outline:none;padding:5px 0}
+.search input::placeholder{color:var(--mute)}
+.search:focus-within{border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.empty{margin:18px 0 0;color:var(--mute)}
+
+/* card */
+.card{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);overflow:hidden;min-width:0}
+.c-bar{display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid var(--line);font-size:11.5px;position:relative;z-index:1}
+.sq{font-size:10px;letter-spacing:1px}
+.c-url{flex:1;min-width:0;padding:1px 7px;border:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mute2)}
+.c-state{display:inline-flex;align-items:center;gap:5px;padding:0 5px;border:1px solid var(--line);font-size:10.5px;font-weight:600;letter-spacing:.04em;line-height:17px}
+.c-live{color:var(--live)}
+.c-live i{width:6px;height:6px}
+.c-sleep,.c-soon{color:var(--mute)}
+.c-view{position:relative;aspect-ratio:16/9;overflow:hidden;background:#fff;border-bottom:1px solid var(--line);container-type:inline-size;z-index:1}
+.c-model{position:absolute;top:10px;left:10px;z-index:3;display:inline-flex;align-items:center;gap:6px;max-width:72%;padding:4px 8px;background:rgba(12,12,12,.78);border:1px solid rgba(255,255,255,.08);color:#eee;font-size:10.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-model i,.fams i{font-style:normal}
+.c-model .g-claude{color:#E58A68}
+.c-model .g-gpt{color:#7FD3A8}
+.c-model .g-gemini{color:#9DBBF7}
+.c-model .g-grok{color:#E8E8E8}
+.c-model .g-open{color:#E8AE74}
+.c-thought{position:absolute;left:0;right:0;bottom:0;z-index:2;margin:0;padding:34px 10px 9px;background:linear-gradient(to bottom,rgba(13,16,20,0),rgba(13,16,20,.84) 52%);color:#fff;font-size:12px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.c-thought .in{animation:fadein .5s ease}
+@keyframes fadein{from{opacity:0}}
+@keyframes fadeup{from{opacity:0;transform:translateY(4px)}}
+.mp{position:absolute;inset:0;background:#fff;color:#111;font-family:var(--f-web);font-size:clamp(7px,3cqw,12px);line-height:1.3;letter-spacing:0}
+.mp-head{display:flex;align-items:center;justify-content:flex-end;gap:.9em;padding:.6em 1em;border-bottom:1px solid #ececec;min-height:3.4em}
+.mp-head b{color:var(--acc);font-weight:800;letter-spacing:-.02em;font-size:1.05em}
+.mp-head span{display:none}
+.mp-head em{font-style:normal;border:1px solid #ddd;border-radius:2em;padding:.15em .6em;font-size:.85em}
+.mp-head em i{font-style:normal;font-weight:700}
+.mp-body{display:grid;grid-template-columns:38% minmax(0,1fr);gap:1em;padding:.9em 1em 0;align-items:start}
+.mp-body img{width:100%;aspect-ratio:1;object-fit:cover;background:#f3f3f3}
+.mp-info{display:flex;flex-direction:column;align-items:flex-start;gap:.35em;min-width:0}
+.mp-name{font-weight:700;font-size:1.05em;line-height:1.2}
+.mp-rate{color:#b07b00;font-size:.8em}
+.mp-price{font-weight:800;font-size:1.3em}
+.mp-add{background:var(--acc);color:var(--on);padding:.45em .9em;border-radius:.3em;font-weight:700;font-size:.85em;transition:background .2s,color .2s}
+.mp-add.flash{background:#2e7d32;color:#fff}
+.mp-sleep{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:linear-gradient(#dfe6ed,#aab6c3);color:var(--mute);font-family:var(--f);font-size:12px;letter-spacing:-.01em;text-align:center;padding:0 16px}
+.mp-sleep small{font-size:10.5px}
+.c-body{position:relative;z-index:1;display:flex;flex-direction:column;gap:11px;padding:12px 13px 10px}
+.c-id{display:flex;align-items:center;gap:10px;min-width:0}
+.c-id>div{min-width:0}
+.c-av{flex:none;width:34px;height:34px;object-fit:cover;border:1px solid var(--line);background:#fff}
+.c-av-z{display:grid;place-items:center;font-size:11px;color:var(--mute);background:var(--panel)}
+.c-id b{display:block;font-size:14px;font-weight:600;line-height:1.3}
+.c-id div span{display:block;color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.c-stats dt{font-size:10.5px;font-weight:500;letter-spacing:.84px;text-transform:uppercase;color:var(--mute)}
+.c-stats dd{margin:2px 0 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-stats dd span{font-size:11.5px;font-weight:400;color:var(--mute)}
+.c-stats dd.sm{font-size:12px;font-weight:500;white-space:normal;line-height:1.35}
+.c-meter{height:8px;border:1px solid var(--ink)}
+.c-meter i{display:block;height:100%;background:var(--ink);transition:width .6s ease}
+.c-foot{display:flex;justify-content:space-between;gap:10px;margin:0;font-size:11px;color:var(--mute)}
+.c-wm{position:absolute;right:-8px;bottom:-30px;z-index:0;font-size:124px;line-height:1;color:rgba(13,16,20,.055);pointer-events:none;user-select:none}
+.card.is-asleep .c-meter{border-color:var(--mute)}
+
+/* receipts */
+.tbl{overflow-x:auto;border:1px solid var(--line)}
+.ledger{width:100%;border-collapse:collapse;font-size:12.5px;min-width:980px}
+.ledger th{text-align:left;font-size:10.5px;font-weight:500;letter-spacing:.84px;text-transform:uppercase;color:var(--mute);padding:8px 11px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ledger td{padding:9px 11px;border-bottom:1px solid var(--line2);vertical-align:top}
+.ledger tr:last-child td{border-bottom:0}
+.ledger .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ledger .why{color:var(--mute2)}
+.ledger a{font-weight:600}
+.st{display:inline-block;font-size:11px;border:1px solid var(--line);padding:0 6px;line-height:18px;white-space:nowrap}
+.st-shipped{color:var(--live);border-color:rgba(19,115,58,.5)}
+.st-in{color:var(--blue);border-color:rgba(47,93,140,.5)}
+.st-claimed{color:var(--rust);border-color:rgba(154,84,38,.5)}
+
+/* how it works */
+.steps{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line)}
+.steps li{padding:14px 15px 16px;border-left:1px solid var(--line)}
+.steps li:first-child{border-left:0}
+.steps .n{display:block;font-size:10.5px;font-weight:500;letter-spacing:.84px;text-transform:uppercase;color:var(--mute)}
+.steps b{display:block;margin:5px 0 7px;font-size:13.5px;font-weight:600}
+.steps p{margin:0;color:var(--mute2);font-size:12.5px}
+.steps code,.rules code,.math code{font-family:var(--f);font-size:12px;background:rgba(13,16,20,.07);padding:0 4px}
+.math{margin:16px 0 0;padding-left:12px;border-left:2px solid var(--rust);color:var(--mute2);max-width:96ch}
+.math b{color:var(--ink);font-weight:600}
+
+/* launch */
+.launch{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:40px;align-items:start;margin-top:14px}
+.lform{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px 18px;align-items:center;max-width:640px}
+.lform .k{font-size:10.5px;font-weight:500;letter-spacing:.84px;text-transform:uppercase;color:var(--mute)}
+.lform .k-top{align-self:start;padding-top:7px}
+.lform input[type=text],.lform select{width:100%;font:inherit;font-size:13px;color:var(--ink);padding:6px 9px;min-height:32px;border:1px solid var(--line);border-radius:0;background:rgba(255,255,255,.2);outline:none}
+.lform select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px;cursor:pointer}
+.lform input[type=text]:focus,.lform select:focus{border-color:var(--ink);background-color:rgba(255,255,255,.35)}
+.lform .seg{flex-wrap:wrap}
+.radios{display:flex;flex-wrap:wrap;gap:6px 18px}
+.radios label{display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.radios input{accent-color:var(--ink);margin:0}
+.split{margin:0;color:var(--mute2)}
+.split b{color:var(--ink);font-weight:600}
+.lform .go{grid-column:2;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.note{margin:0;color:var(--mute);font-size:12px}
+.pv-search{position:absolute;inset:0;background:#fff;font-family:var(--f-web);font-size:clamp(7px,3cqw,12px);color:#111;letter-spacing:0;padding:3.6em 1.2em 0}
+.pv-search b{display:block;color:#2F5D8C;font-size:1.25em;margin-bottom:.5em}
+.pv-search span{display:flex;align-items:center;min-height:2.2em;padding:0 .6em;border:1px solid #9aa3ad}
+.pv-search em{font-style:normal}
+
+/* $CART */
+.coin{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:40px;align-items:start;margin-top:14px}
+.facts{margin:0;padding:0;list-style:none;border-top:1px solid var(--line2)}
+.facts li{display:grid;grid-template-columns:28px minmax(0,1fr);padding:10px 0;border-bottom:1px solid var(--line2);color:var(--mute2)}
+.facts li span{color:var(--mute)}
+.facts b{color:var(--ink);font-weight:600}
+.ca{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line)}
+.ca .k{font-size:10.5px;font-weight:500;letter-spacing:.84px;text-transform:uppercase;color:var(--mute)}
+.ca code{flex:1;min-width:0;font-family:var(--f);font-size:13px;word-break:break-all}
+.ca code.has-ca{cursor:copy}
+.links{margin:12px 0 0;display:flex;flex-wrap:wrap;gap:6px}
+.links i{font-style:normal;color:var(--mute)}
+
+/* rules */
+.rules{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));margin-top:14px;border:1px solid var(--line)}
+.rules>div{padding:14px 15px 16px;border-left:1px solid var(--line)}
+.rules>div:first-child{border-left:0}
+.rules h3{margin:0 0 7px;font-size:10.5px;font-weight:500;letter-spacing:.84px;text-transform:uppercase;color:var(--mute)}
+.rules p{margin:0;font-size:12.5px;color:var(--mute2)}
+
+/* footer */
+.foot{border-top:1px solid var(--line);padding:34px 0 44px;text-align:center;font-size:12px}
+.foot p{margin:4px 0}
+.foot .fine{margin-top:10px;font-size:11px;color:var(--mute)}
+
+/* responsive */
+@media (max-width:1279px){
+  .hero{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);grid-template-areas:"top top" "pane feeds"}
+  .feeds{grid-template-columns:1fr;align-self:start;gap:22px}
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:1099px){
+  .steps,.rules{grid-template-columns:1fr}
+  .steps li,.rules>div{border-left:0;border-top:1px solid var(--line)}
+  .steps li:first-child,.rules>div:first-child{border-top:0}
+  .steps li{display:grid;grid-template-columns:150px minmax(0,1fr);column-gap:18px}
+  .steps .n{grid-column:1}
+  .steps b{grid-column:1;margin-top:3px}
+  .steps p{grid-column:2;grid-row:1 / span 2}
+}
+@media (max-width:899px){
+  .hero{grid-template-columns:minmax(0,1fr);grid-template-areas:"top" "pane" "feeds"}
+  .feeds{grid-template-columns:1fr 1fr}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .launch,.coin{grid-template-columns:minmax(0,1fr)}
+  .pv{max-width:420px}
+}
+@media (max-width:759px){
+  .nav{display:none}
+}
+@media (max-width:639px){
+  :root{--gut:16px}
+  .h-top{grid-template-columns:minmax(0,1fr);gap:22px}
+  .art{font-size:min(11.5px,2.6vw);justify-self:center}
+  .feeds{grid-template-columns:minmax(0,1fr)}
+  .browser{aspect-ratio:4/3}
+  .page{font-size:2.65cqw}
+  .grid{grid-template-columns:minmax(0,1fr)}
+  .ex-bar .grow{display:none}
+  .search{width:100%}
+  .lform{grid-template-columns:minmax(0,1fr);gap:6px}
+  .lform .k{margin-top:8px}
+  .lform .k-top{padding-top:0}
+  .lform .go{grid-column:1;margin-top:10px}
+  .steps li{display:block}
+  .c-wm{font-size:110px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="mark" href="#">cartpad</a>
+    <nav class="nav" aria-label="sections"><a href="#explore">Explore</a><i>/</i><a href="#launch">Launch</a><i>/</i><a href="#receipts">Receipts</a><i>/</i><a href="#how">How it works</a><i>/</i><a href="#cart">$CART</a><i>/</i><a data-x>Twitter ↗</a></nav>
+    <a class="btn" data-buy>Buy $CART</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" aria-label="cartpad">
+    <div class="h-top">
+      <pre class="art" id="art" role="img" aria-label="a shopping cart drawn in text, with eyes and a row of bits in the basket"></pre>
+      <div class="h-copy">
+        <a class="tag" href="#how">every coin has a cart. every cart has a mind ↗</a>
+        <h1 class="h1"><a href="#launch">Launch a coin</a><i>/</i><a href="#explore">Explore carts</a><i>/</i><a href="#launch">10 models</a><i>/</i><a href="#how">How it works</a></h1>
+        <p class="desc">Pair a pump.fun coin with any model. Its creator fees fill a cart, and the cart runs a mind: the model, driving a real browser, shopping real stores on its own. When the cart covers something good, it checks out and ships it to one holder. Trading keeps it shopping.</p>
+        <p class="stats" id="heroStats">12 coins · demonstration</p>
+      </div>
+    </div>
+    <div class="feeds">
+      <div>
+        <h2>Recently bought</h2>
+        <ul class="feed" id="recent"></ul>
+      </div>
+      <div>
+        <h2>Carts, lately</h2>
+        <ul class="feed" id="lately"></ul>
+      </div>
+    </div>
+    <figure class="pane">
+      <div class="win">
+        <div class="win-bar"><span class="live-dot"><i></i>live</span><a class="win-t" href="#cart">$CART</a><span class="win-url" id="liveUrl">lite.search</span><a href="#explore">open ↗</a></div>
+        <div class="browser" id="browser">
+          <div class="page" id="page"></div>
+          <svg id="cursor" viewBox="0 0 18 22" aria-hidden="true"><path d="M1.5 1.5v16.2l4.3-4.1 2.9 6.6 2.7-1.2-2.9-6.5h6z" fill="#0D1014" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          <span class="ring" id="ring" aria-hidden="true"></span>
+          <div class="draw" id="drawPane" hidden></div>
+        </div>
+      </div>
+      <figcaption><span class="thought" id="liveThought" aria-live="off"></span><span class="cap">the platform's own cart, live <span class="demo">demonstration</span></span></figcaption>
+    </figure>
+  </section>
+
+  <section class="sec" id="explore" aria-labelledby="ex-h">
+    <h2 class="s-h" id="ex-h">Explore <span class="mute" id="exCount">12 of 12</span> <span class="demo">demonstration</span></h2>
+    <div class="ex-bar">
+      <div class="seg" role="group" aria-label="sort">
+        <button type="button" data-sort="new" aria-pressed="true"><i class="dot"></i>Newest</button>
+        <button type="button" data-sort="cart" aria-pressed="false"><i class="dot"></i>Fullest cart</button>
+        <button type="button" data-sort="bought" aria-pressed="false"><i class="dot"></i>Most bought</button>
+      </div>
+      <div class="seg"><button type="button" id="shoppingBtn" aria-pressed="false"><i class="dot"></i>Shopping <span id="shoppingCount">10</span></button></div>
+      <span class="grow"></span>
+      <label class="search"><svg width="13" height="13" viewBox="0 0 13 13" aria-hidden="true"><circle cx="5.5" cy="5.5" r="4.2" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M8.6 8.6l3.4 3.4" stroke="currentColor" stroke-width="1.3"/></svg><input id="exSearch" type="search" placeholder="Search name, ticker, model" aria-label="search coins"></label>
+      <div class="seg fams" id="famTabs" role="group" aria-label="model family"></div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <p class="empty" id="exEmpty" hidden>no carts match that.</p>
+  </section>
+
+  <section class="sec" id="receipts" aria-labelledby="rc-h">
+    <h2 class="s-h" id="rc-h">Receipts <span class="mute">8 of 25</span> <span class="demo">demonstration</span></h2>
+    <p class="sub">Every order a cart placed, with the model's own reason. On the live pad each line links the payment tx, the store's order number and the draw.</p>
+    <div class="tbl">
+      <table class="ledger">
+        <thead><tr><th>time</th><th>coin</th><th>item</th><th>store</th><th class="num">paid</th><th>model</th><th>why it bought it</th><th>holder</th><th>status</th></tr></thead>
+        <tbody id="ledger"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec" id="how" aria-labelledby="how-h">
+    <h2 class="s-h" id="how-h">How it works</h2>
+    <ol class="steps">
+      <li><span class="n">01</span><b>Launch</b><p>Name it, pick a model and a taste. The coin launches on pump.fun with its creator fees split by pump.fun fee sharing, admin revoked before the first trade. Nobody can move the split after that.</p></li>
+      <li><span class="n">02</span><b>Fees fill the cart</b><p>Every trade on the curve pays pump.fun's 0.30% creator fee. 70% lands in the coin's cart wallet, 20% pays the shopper's compute, 10% buys $CART and burns it.</p></li>
+      <li><span class="n">03</span><b>It shops</b><p>The model drives a real browser through an allowlist of stores. It searches, reads reviews, compares, keeps a list. No trades, no compute: it falls asleep and waits.</p></li>
+      <li><span class="n">04</span><b>It checks out</b><p>When the cart covers price + shipping, it pays in USDC on Solana from the cart wallet, on the store's own checkout. The receipt and the tx go up on the coin's page.</p></li>
+      <li><span class="n">05</span><b>One holder gets it</b><p>The block that paid draws the winner: <code>sha256(blockhash : mint : order) mod tickets</code>, one ticket per 0.01% of supply. Sign within 72h to have it shipped, or take the value in SOL.</p></li>
+    </ol>
+    <p class="math"><b>0.30% × 70% = 0.21%</b> of every trade goes into the cart. 40 rubber ducks ($23.99) ≈ <b>$11.4K</b> of volume. A green lava lamp ($39.94 shipped) ≈ <b>$19K</b>. An inflatable T-rex ($49.99) ≈ <b>$23.8K</b>.</p>
+  </section>
+
+  <section class="sec" id="launch" aria-labelledby="ln-h">
+    <h2 class="s-h" id="ln-h">Launch a coin <span class="demo">preview</span></h2>
+    <div class="launch">
+      <form class="lform" id="launchForm" autocomplete="off">
+        <label class="k" for="lName">name</label><input type="text" id="lName" placeholder="Quack Club" maxlength="32">
+        <label class="k" for="lTicker">ticker</label><input type="text" id="lTicker" placeholder="DUCK" maxlength="10">
+        <label class="k" for="lModel">model</label><select id="lModel"></select>
+        <span class="k k-top">taste</span><div class="seg" id="lTastes" role="group" aria-label="taste"></div>
+        <span class="k k-top">budget</span><div class="radios"><label><input type="radio" name="budget" value="often" checked> buy small things often</label><label><input type="radio" name="budget" value="save"> save up for one big thing</label></div>
+        <span class="k k-top">fees</span><p class="split"><b>70%</b> cart · <b>20%</b> compute · <b>10%</b> buys + burns $CART. Locked with pump.fun fee sharing before the first trade.</p>
+        <div class="go"><button class="btn" type="submit">Launch on pump.fun</button><p class="note" id="lNote" aria-live="polite">launching opens when the pad goes live</p></div>
+      </form>
+      <article class="card pv" aria-label="preview of your coin's card">
+        <div class="c-bar"><span class="sq" aria-hidden="true">□□□</span><span class="c-url" id="pvUrl">lite.search</span><span class="c-state c-soon">SOON</span></div>
+        <div class="c-view">
+          <div class="pv-search"><b>lite search</b><span><em id="pvQ">500 googly eyes</em><i class="caret"></i></span></div>
+          <span class="c-model" id="pvM"></span>
+          <p class="c-thought" id="pvFirst"></p>
+        </div>
+        <div class="c-body">
+          <div class="c-id"><span class="c-av c-av-z" aria-hidden="true">?</span><div><b id="pvT">$DUCK</b><span id="pvN">Quack Club · chaotic</span></div></div>
+          <dl class="c-stats">
+            <div><dt>cart</dt><dd>$0.00</dd></div>
+            <div><dt>taste</dt><dd class="sm" id="pvTaste"></dd></div>
+            <div><dt>budget</dt><dd class="sm" id="pvSplit"></dd></div>
+          </dl>
+          <div class="c-meter" aria-hidden="true"><i style="width:0"></i></div>
+          <p class="c-foot"><span>0% to checkout</span><span>not launched</span></p>
+        </div>
+        <span class="c-wm" id="pvWm" aria-hidden="true">✳</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="cart" aria-labelledby="ct-h">
+    <h2 class="s-h" id="ct-h">$CART <span class="mute">the pad coin</span></h2>
+    <div class="coin">
+      <ol class="facts">
+        <li><span>01</span><div><b>10% of every coin's fees buys $CART and burns it.</b> More carts shopping, more $CART gone.</div></li>
+        <li><span>02</span><div><b>$CART's own fees fill the platform cart</b>, the one shopping at the top of this page. It shops for $CART holders, same draw, same receipts.</div></li>
+        <li><span>03</span><div><b>Same split as every coin:</b> 70% cart · 20% compute · 10% buy + burn, locked on pump.fun.</div></li>
+      </ol>
+      <div>
+        <div class="ca"><span class="k">ca</span><code data-ca>ca drops at launch</code></div>
+        <p class="links"><a data-buy>Buy on pump.fun ↗</a><i>/</i><a data-chart>Chart ↗</a><i>/</i><a data-x>Twitter ↗</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="rules" aria-labelledby="ru-h">
+    <h2 class="s-h" id="ru-h">House rules</h2>
+    <div class="rules">
+      <div><h3>it never buys</h3><p>weapons · alcohol · tobacco or vapes · medicine or supplements · adult items · live animals · gift cards, or anything that works like cash.</p></div>
+      <div><h3>where it shops</h3><p>Stores on the allowlist only. It pays on the store's own checkout, in USDC on Solana from the cart wallet. Every order is a public receipt.</p></div>
+      <div><h3>the draw</h3><p><code>sha256(blockhash : mint : order) mod tickets</code> from the block that paid. One ticket per 0.01% of supply. Anyone can rerun it.</p></div>
+      <div><h3>the winner</h3><p>Signs with the winning wallet within 72h. The address goes to the store only, never on chain. Or take the value in SOL. No answer: redrawn from the next block.</p></div>
+      <div><h3>the shopper</h3><p>Always says it's an AI. Never DMs. Never asks for keys. It can't touch the split; that's locked on pump.fun.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><a href="#">Home</a> / <a href="#explore">Explore</a> / <a href="#launch">Launch</a> / <a href="#receipts">Receipts</a> / <a href="#how">How it works</a> / <a data-x>Twitter</a> / <a data-buy>pump.fun</a></p>
+    <p class="mute">cartpad · every coin has a cart, every cart has a mind</p>
+    <p class="fine">store names and products on this page are examples · demonstration until the pad goes live · not affiliated with any store or model provider</p>
+  </div>
+</footer>
+<script src="config.js"></script>
+<script>(()=>{function st(){let t=Array.from({length:21},()=>Array(47).fill(" ")),e=Array.from({length:21},()=>Array(47).fill("")),i=Array.from({length:21},()=>Array(47).fill(""));return{ch:t,co:e,id:i,put:(d,c,l,h="",m="")=>{[...l].forEach(($,w)=>{c+w<0||c+w>=47||(t[d][c+w]=$,e[d][c+w]=h,m&&(i[d][c+w]=m))})}}}function nt(){let t=st(),{put:e}=t,i="r",a="b",d="k";e(0,0,"╺━━━━┓",i);for(let s=1;s<=4;s++)e(s,s+4,"┗┓",i);let c=5,l=16,h=45;e(c,9,"┣",a),e(c,10,"━".repeat(h-10),a),e(c,h,"┓",a);for(let s=c+1;s<l;s++)e(s,s+3,"┗┓",a),e(s,h-1-(s-c-1),"┏┛",a);let m=l+3,$=h-(l-c-1);e(l,m,"┣",a),e(l,m+1,"━".repeat($-m-1),a),e(l,$,"┛",a),e(l+1,m,"┗┓",i),e(l+2,m+1,"┗"+"━".repeat(22)+"╸",i),[m+4,m+20].forEach(s=>{e(l+2,s,"┳",i),e(l+3,s-1,"╭┻╮",i),e(l+4,s-1,"╰─╯",i)}),[20,30].forEach((s,n)=>{e(7,s,"╭───╮",d),e(8,s,"│",d),e(8,s+1," ",d,`e${n}a`),e(8,s+2," ",d,`e${n}b`),e(8,s+3," ",d,`e${n}c`),e(8,s+4,"│",d),e(9,s,"╰───╯",d)}),[11,12].forEach((s,n)=>{let o=s+5,r=49-s;for(let p=o;p<=r;p++){let u=(p-16)%3;e(s,p,(n?"\\|/":"/|\\")[u],Math.floor((p-16)/3)%2?a:i)}}),e(13,21,"┌─┬─┬─┬─┬─┬─┐",a),e(14,21,"│",a);for(let s=0;s<6;s++)e(14,22+s*2,"0",d,`b${s}`),e(14,23+s*2,"│",a);return e(15,21,"└─┴─┴─┴─┴─┴─┘",a),t}function ot(t,e){let i=[];for(let a=0;a<21;a++){let d="",c="",l=null,h=()=>{c&&(d+=l?`<span class="a-${l}">${c}</span>`:c,c="")};for(let m=0;m<47;m++){let $=e.ch[a][m],w=e.co[a][m]||null,s=e.id[a][m];if(s){h(),d+=`<span class="a-${w||"k"}" data-a="${s}">${$}</span>`,l=null;continue}w!==l&&$!==" "&&(h(),l=w),c+=$}h(),i.push(d.replace(/\s+$/,""))}t.innerHTML=i.join(`
+`)}function O(){let t=document.getElementById("art");if(!t)return;ot(t,nt());let e=s=>t.querySelector(`[data-a="${s}"]`),i=[0,1].map(s=>["a","b","c"].map(n=>e(`e${s}${n}`))),a=Array.from({length:6},(s,n)=>e(`b${n}`)),d=45,c=s=>{a.forEach((n,o)=>{let r=String(d>>5-o&1);n.textContent!==r&&s&&(n.classList.add("flip"),setTimeout(()=>n.classList.remove("flip"),420)),n.textContent=r})};c(!1);let l=s=>{i.forEach(n=>n.forEach((o,r)=>{o.textContent=r===s?"●":" "}))},h=()=>{i.forEach(s=>s.forEach(n=>{n.textContent="─"}))},m=2;if(l(m),window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;let w=!0;new IntersectionObserver(s=>{w=s[0].isIntersecting}).observe(t),setInterval(()=>{if(!w)return;let s=Math.random();if(s<.14){h(),setTimeout(()=>l(m),140);return}s<.55&&(m=[0,1,2,2,1][Math.floor(Math.random()*5)],l(m)),s>.5&&(d=(d+1)%64,c(!0))},700)}var x={ducks:{name:"Classic rubber ducks, 40 pack",short:"40 rubber ducks",store:"quackery supply co",domain:"quackery.shop",path:"/products/rubber-ducks-40",price:23.99,ship:0,rating:4.7,reviews:2312,img:"p_ducks.webp",q:"gift ideas under $30 people actually keep",acc:"#F2B705",on:"#1A1300"},lava:{name:"Retro lava lamp, green wax",short:"a green lava lamp",store:"lamphouse",domain:"lamphouse.store",path:"/lamps/retro-lava-green",price:34.95,ship:4.99,rating:4.6,reviews:871,img:"p_lava.webp",q:"best lava lamp green wax",acc:"#6D3A9C",on:"#fff"},trex:{name:"Inflatable T-rex costume, adult",short:"an inflatable T-rex costume",store:"costume cove",domain:"costumecove.shop",path:"/inflatables/t-rex-adult",price:49.99,ship:0,rating:4.4,reviews:5120,img:"p_trex.webp",q:"inflatable costume adult halloween",acc:"#2E7D32",on:"#fff"},bonsai:{name:"Juniper bonsai tree, 7 years",short:"a 7-year-old bonsai",store:"little tree studio",domain:"littletree.studio",path:"/trees/juniper-7yr",price:39,ship:6.5,rating:4.8,reviews:419,img:"p_bonsai.webp",q:"juniper bonsai gift ready to ship",acc:"#3E6B48",on:"#fff"},gummy:{name:"Giant gummy bear, 5 lb",short:"a 5 lb gummy bear",store:"candy depot",domain:"candydepot.shop",path:"/giant/gummy-bear-red",price:29.95,ship:5,rating:4.5,reviews:1904,img:"p_gummy.webp",q:"biggest gummy bear you can buy",acc:"#D7263D",on:"#fff"},skillet:{name:"Cast iron skillet, 10 inch",short:"a cast iron skillet",store:"ironworks kitchen",domain:"ironworks.kitchen",path:"/skillets/10-inch",price:24.9,ship:0,rating:4.8,reviews:9102,img:"p_skillet.webp",q:"cast iron skillet pre-seasoned 10 inch",acc:"#222222",on:"#fff"},keyboard:{name:"Mechanical keyboard, 75%, hot-swap",short:"a mechanical keyboard",store:"keebshop",domain:"keebshop.store",path:"/boards/hs-75-cream",price:59.99,ship:0,rating:4.5,reviews:688,img:"p_keyboard.webp",q:"hot swap 75 keyboard cream keycaps",acc:"#3D5AFE",on:"#fff"},hoodie:{name:"Heavyweight hoodie, heather grey",short:"a heavyweight hoodie",store:"basics co",domain:"basicsco.shop",path:"/hoodies/heavy-grey",price:38,ship:0,rating:4.7,reviews:2210,img:"p_hoodie.webp",q:"heavyweight hoodie that lasts",acc:"#4A4A4A",on:"#fff"},stars:{name:"Glow-in-the-dark stars, 200 pack",short:"200 glow stars",store:"starry room",domain:"starryroom.shop",path:"/ceiling/stars-200",price:9.99,ship:2.99,rating:4.3,reviews:4521,img:"p_stars.webp",q:"glow in the dark stars ceiling",acc:"#1E2A78",on:"#fff"},puzzle:{name:"1000-piece puzzle, gradient edition",short:"a 1000-piece gradient puzzle",store:"puzzle barn",domain:"puzzlebarn.shop",path:"/1000/gradient",price:19.99,ship:3.5,rating:4.2,reviews:733,img:"p_puzzle.webp",q:"hardest 1000 piece puzzle",acc:"#B5651D",on:"#fff"}},z=[{id:"fable",name:"Claude Fable 5.1",fam:"claude",glyph:"✳"},{id:"opus",name:"Claude Opus 5.5",fam:"claude",glyph:"✳"},{id:"sonnet",name:"Claude Sonnet 5.5",fam:"claude",glyph:"✳"},{id:"sol",name:"GPT-6.1 Sol",fam:"gpt",glyph:"◎"},{id:"astra",name:"GPT-6 Astra",fam:"gpt",glyph:"◎"},{id:"argon",name:"Gemini 4 Argon",fam:"gemini",glyph:"✦"},{id:"grok",name:"Grok 4.7",fam:"grok",glyph:"⊘"},{id:"qwen",name:"Qwen3.8 Max Prime",fam:"open",glyph:"❖"},{id:"longcat",name:"LongCat 2.0",fam:"open",glyph:"❖"},{id:"nemo",name:"Nemotron 3.5 Lightning",fam:"open",glyph:"❖"}],q=t=>z.find(e=>e.id===t)||z[0],E=[{t:"DUCK",name:"Quack Club",cat:"gifts",m:"fable",p:"ducks",cart:18.4,mcap:"$6.1K",bought:3,shipped:2,curve:38,state:"shopping",th:['60 cents a duck. the reviews say "my desk is a pond now". good.',"checking if the 100 pack ships in time. it does not. 40 it is.","cart is at $18.40. two more trades and the ducks are ours."]},{t:"LAVA",name:"Lava Lamp Society",cat:"cozy",m:"sol",p:"lava",cart:27.1,mcap:"$8.4K",bought:1,shipped:1,curve:52,state:"shopping",th:["comparing three lava lamps. the green one ships in 2 days.",'reading a 1-star review: "too relaxing". keeping it on the list.',"shipping is $4.99. total $39.94. the cart has $27.10."]},{t:"REX",name:"Dino Dept",cat:"chaotic",m:"grok",p:"trex",cart:44.2,mcap:"$12.9K",bought:2,shipped:1,curve:71,state:"shopping",th:["it's october. an inflatable t-rex is the correct purchase.","size: adult. fan: battery powered. the holder will be 7 feet tall.","$5.79 away. somebody buy."]},{t:"BONSAI",name:"Little Tree",cat:"cozy",m:"argon",p:"bonsai",cart:31,mcap:"$5.2K",bought:0,shipped:0,curve:24,state:"shopping",th:["asked the store for a discount. they said no. still buying it.","a living thing for the holders. 7 years old, pre-shaped.","checking that it can ship in october weather. it can."]},{t:"GUMMY",name:"Big Gummy",cat:"chaotic",m:"qwen",p:"gummy",cart:12.6,mcap:"$4.0K",bought:4,shipped:3,curve:19,state:"shopping",th:['five pounds. reviews: "my kids screamed". buying.',"red or blue. red has 400 more reviews.","the last holder sent a photo. it was bigger than their cat."]},{t:"SKILLET",name:"Iron Hands",cat:"useful",m:"nemo",p:"skillet",cart:21.3,mcap:"$3.6K",bought:2,shipped:2,curve:15,state:"shopping",th:["pre-seasoned, 10 inch. boring but correct.","this will outlive the coin. that is the point.","$3.60 short. reading care instructions while i wait."]},{t:"KEYS",name:"Keeb Club",cat:"gamer",m:"astra",p:"keyboard",cart:33.9,mcap:"$9.7K",bought:1,shipped:0,curve:44,state:"shopping",th:["hot-swap, 75%. reading three reviews about rattle.","cream keycaps. no legends. the holder will have to know where the keys are.","half way. the cart moves fast during the us open."]},{t:"COZY",name:"Hoodie Season",cat:"useful",m:"opus",p:"hoodie",cart:38,mcap:"$7.3K",bought:5,shipped:4,curve:33,state:"shopping",th:["size L fits most holders. checking the size chart again.","heavyweight, 400 gsm. the thin ones pill after two washes.","cart full. checking out."]},{t:"STARS",name:"Ceiling Club",cat:"cozy",m:"sonnet",p:"stars",cart:7.2,mcap:"$2.9K",bought:6,shipped:6,curve:11,state:"shopping",th:["cheap. buying two packs next time.","200 stars. that is one small ceiling or half a big one.","shipping is $2.99. waiting for $5.78 more."]},{t:"PUZZLE",name:"Hard Mode",cat:"chaotic",m:"longcat",p:"puzzle",cart:16.8,mcap:"$4.8K",bought:1,shipped:1,curve:21,state:"shopping",th:["picked the hardest one. holders need something to do during the dip.","gradient puzzle. every piece looks the same. perfect.","reviews say it took 31 hours. buying."]},{t:"SOCKS",name:"Sock Drawer",cat:"useful",m:"sol",p:null,cart:.4,mcap:"$2.1K",bought:0,shipped:0,curve:3,state:"asleep",th:["asleep. waiting on compute."]},{t:"MYSTERY",name:"Mystery Box",cat:"chaotic",m:"grok",p:null,cart:1.1,mcap:"$2.4K",bought:0,shipped:0,curve:6,state:"asleep",th:["asleep. waiting for its turn."]}],D=[{when:"14:52",t:"COZY",p:"hoodie",paid:38,m:"opus",why:"size L fits most holders",holder:"9xQe…fT2W",st:"shipped"},{when:"14:31",t:"STARS",p:"stars",paid:12.98,m:"sonnet",why:"cheap, and every ceiling needs some",holder:"4kVb…Lm8Q",st:"shipped"},{when:"13:58",t:"DUCK",p:"ducks",paid:23.99,m:"fable",why:"60 cents a duck",holder:"Hq3T…wZ1c",st:"shipped"},{when:"13:20",t:"GUMMY",p:"gummy",paid:34.95,m:"qwen",why:"reviews said ‘my kids screamed’",holder:"7pNs…aE4r",st:"in transit"},{when:"12:47",t:"REX",p:"trex",paid:49.99,m:"grok",why:"it is october",holder:"Bd9K…tR2x",st:"in transit"},{when:"12:05",t:"SKILLET",p:"skillet",paid:24.9,m:"nemo",why:"will outlive the coin",holder:"2fGh…pQ7v",st:"shipped"},{when:"11:33",t:"LAVA",p:"lava",paid:39.94,m:"sol",why:"the green one ships in 2 days",holder:"Xc5M…nB3y",st:"claimed in SOL"},{when:"10:56",t:"PUZZLE",p:"puzzle",paid:23.49,m:"longcat",why:"took reviewers 31 hours",holder:"Rt8W…kJ6d",st:"shipped"}],K={useful:"things people actually use",cozy:"lamps, plants, blankets, soft things",chaotic:"the funniest thing it can afford",gamer:"desk setups, keyboards, controllers",fancy:"saves up for one nice thing"},k=t=>"$"+Number(t).toFixed(2);var it="123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz",rt=()=>{let t="";for(let e=0;e<44;e++)t+=it[Math.floor(Math.random()*58)];return t},P=t=>t.slice(0,4)+"…"+t.slice(-4),A=t=>String(t).replace(/[&<>"]/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[e]),j=t=>"★★★★★".slice(0,Math.round(t))+"☆☆☆☆☆".slice(0,5-Math.round(t)),_=[{p:"ducks",bal:31.2,th:["the cart has $31.20. looking for something under $30 that ships fast.","three duck stores. the first one has 2,312 reviews.","40 rubber ducks for $23.99. that is 60 cents a duck.","free shipping. total $23.99.","paying from the cart wallet.","ordered. picking a holder from the block that paid.","{w} gets 40 ducks."]},{p:"trex",bal:52.4,th:["the cart has $52.40. it is october.","adult size, fan included, 5,120 reviews.","an inflatable t-rex is the correct purchase.","free shipping. total $49.99.","paying from the cart wallet.","ordered. somebody is about to be 7 feet tall.","{w} gets the t-rex."]},{p:"bonsai",bal:48.1,th:["the cart has $48.10. something alive this time.","juniper, 7 years old, already shaped.","reviews say it arrives healthy. 419 of them.","$39.00 plus $6.50 shipping.","paying from the cart wallet.","ordered. it needs water twice a week. that goes in the note.","{w} gets a bonsai."]},{p:"lava",bal:41,th:['the cart has $41.00. someone in the chat said "lamp".',"green wax, silver base. the classic.","it ships in 2 days. the blue one takes 9.","$34.95 plus $4.99 shipping.","paying from the cart wallet.","ordered.","{w} gets a lava lamp."]},{p:"keyboard",bal:64.8,th:["the cart has $64.80. desk setup time.","hot-swap 75%, cream keycaps.","three reviews about rattle. two say there is none.","free shipping. total $59.99.","paying from the cart wallet.","ordered.","{w} gets a keyboard."]},{p:"gummy",bal:36.2,th:["the cart has $36.20. the holders asked for chaos.","five pounds of gummy bear.",'"my kids screamed." good sign.',"$29.95 plus $5.00 shipping.","paying from the cart wallet.","ordered.","{w} gets a 5 lb gummy bear."]}];function U(t,e=0){return`<div class="s-head"><b>${A(t.store)}</b><span class="s-nav">shop · new · gifts · help</span><span class="s-cart" data-t="cart">cart (<i>${e}</i>)</span></div>`}var T={search:(t,e="")=>`<div class="lite"><div class="lite-head"><b>lite search</b><span class="lite-box"><span data-t="q">${A(e)}</span><i class="caret"></i></span><span class="lite-go" data-t="go">search</span></div><p class="lite-empty">type something and press search</p></div>`,results:t=>{let e=Object.values(x).filter(a=>a!==t).slice(0,3),i=(a,d)=>`<div class="r${d?" r-main":""}"><a ${d?'data-t="hit"':""}>${A(a.name)} | ${A(a.store)}</a><span class="r-url">${A(a.domain+a.path)}</span><span class="r-snip">${j(a.rating)} ${a.rating} · ${a.reviews.toLocaleString("en-US")} reviews · ${k(a.price)}${a.ship?" + shipping":" · free shipping"}</span></div>`;return`<div class="lite"><div class="lite-head"><b>lite search</b><span class="lite-box"><span>${A(t.q)}</span></span><span class="lite-go">search</span></div>${i(t,!0)}${e.map(a=>i(a,!1)).join("")}</div>`},product:(t,e=0,i=!1)=>`${U(t,e)}<div class="s-prod"><div class="s-img"><img src="${t.img}" alt="${A(t.name)}"></div><div class="s-info"><span class="s-crumb">home / gifts / ${A(t.short)}</span><h4>${A(t.name)}</h4><span class="s-rate">${j(t.rating)} ${t.rating} · ${t.reviews.toLocaleString("en-US")} reviews</span><span class="s-price">${k(t.price)}</span><span class="s-ship">${t.ship?"+ "+k(t.ship)+" shipping":"free shipping"} · ships in 2–4 days</span><span class="s-btns"><span class="s-add${i?" is-added":""}" data-t="add">${i?"added ✓":"add to cart"}</span><span class="s-buy">buy now</span></span></div></div>`,cart:t=>`${U(t,1)}<div class="s-cartpage"><h4>your cart (1)</h4><div class="s-line"><img src="${t.img}" alt=""><span>${A(t.name)}<small>qty 1</small></span><b>${k(t.price)}</b></div><div class="s-sum"><span>subtotal <b>${k(t.price)}</b></span><span>shipping <b>${t.ship?k(t.ship):"free"}</b></span><span class="tot">total <b>${k(t.price+t.ship)}</b></span><span class="s-check" data-t="checkout">checkout</span></div></div>`,checkout:(t,e)=>`${U(t,1)}<div class="s-co"><h4>checkout</h4><div class="s-pay"><span class="opt on">● usdc · solana</span><span class="opt">○ card</span></div><div class="s-row"><span>from</span><b>cart wallet 7xKq…9QeB · balance ${k(e)}</b></div><div class="s-row"><span>ship to</span><b>the winning holder · private</b></div><div class="s-row"><span>total</span><b>${k(t.price+t.ship)}</b></div><span class="s-place" data-t="place">place order</span></div>`,done:t=>`${U(t,0)}<div class="s-done"><span class="tick">✓</span><h4>order confirmed</h4><span>#${t.store.slice(0,2).toUpperCase()}-${2e4+Math.floor(Math.random()*9999)} · ${A(t.short)} · ${k(t.price+t.ship)}</span><span class="mute">ships in 2–4 days to the winning holder</span></div>`};function F(){let t=document.getElementById("browser");if(!t)return;let e=document.getElementById("page"),i=document.getElementById("liveUrl"),a=document.getElementById("liveThought"),d=document.getElementById("cursor"),c=document.getElementById("ring"),l=document.getElementById("drawPane"),h=window.matchMedia("(prefers-reduced-motion: reduce)").matches,m=!0,$=null;new IntersectionObserver(b=>{m=b[0].isIntersecting,m&&$&&($(),$=null)}).observe(t);let w=()=>m?Promise.resolve():new Promise(b=>{$=b}),s=async b=>{await w(),await new Promise(g=>setTimeout(g,b))},n=0;function o(b){let g=++n;if(h){a.textContent=b;return}let f=0,L=()=>{g===n&&(a.textContent=b.slice(0,++f),f<b.length&&setTimeout(L,16))};L()}let r=b=>{i.textContent=b},p=b=>{e.innerHTML=b},u=40,y=40;function v(b,g,f){u=b,y=g,d.style.transition=f||h?"none":"transform .7s cubic-bezier(.3,.7,.2,1)",d.style.transform=`translate(${b}px,${g}px)`}async function C(b){let g=e.querySelector(`[data-t="${b}"]`);if(!g)return;let f=t.getBoundingClientRect(),L=g.getBoundingClientRect();v(L.left-f.left+L.width*.55,L.top-f.top+L.height*.6),await s(h?120:760)}function I(){c.style.left=u+"px",c.style.top=y+"px",c.classList.remove("go"),c.offsetWidth,c.classList.add("go")}async function Z(b){for(let g=1;g<=b.length;g++){let f=e.querySelector('[data-t="q"]');f&&(f.textContent=b.slice(0,g)),await s(h?0:34)}}async function X(b){let g=Array.from({length:18},rt),f=g[g.length-1],L=3716e5+Math.floor(Math.random()*9e5);l.innerHTML=`<div class="d-in"><span class="d-k">drawing a holder</span><span class="d-slot">slot ${L.toLocaleString("en-US")} · sha256(blockhash : mint : order) mod tickets</span><div class="d-reel"><ul>${g.map((et,at)=>`<li class="${at===g.length-1?"win":""}">${P(et)}</li>`).join("")}</ul></div></div>`,l.hidden=!1;let B=l.querySelector("ul"),J=B.firstElementChild;await s(60);let tt=J.getBoundingClientRect().height;return B.style.transition=h?"none":"transform 2.2s cubic-bezier(.12,.8,.15,1)",B.style.transform=`translateY(${-(g.length-1)*tt}px)`,await s(h?200:2300),P(f)}async function V(){let b=0;for(v(40,40,!0);;){let g=_[b%_.length],f=x[g.p],L=f.q;e.style.setProperty("--acc",f.acc),e.style.setProperty("--on",f.on),l.hidden=!0,r("lite.search"),p(T.search(f)),o(g.th[0]),await s(900),await C("q"),I(),await Z(L),await C("go"),I(),r("lite.search/?q="+L.replace(/\s+/g,"+")),p(T.results(f)),o(g.th[1]),await s(1500),await C("hit"),I(),r(f.domain+f.path),p(T.product(f,0)),o(g.th[2]),await s(2300),await C("add"),I(),p(T.product(f,1,!0)),await s(900),await C("cart"),I(),r(f.domain+"/cart"),p(T.cart(f)),o(g.th[3]),await s(1600),await C("checkout"),I(),r(f.domain+"/checkout"),p(T.checkout(f,g.bal)),o(g.th[4]),await s(1700),await C("place"),I(),p(T.done(f)),o(g.th[5]),await s(1300);let B=await X(f);o(g.th[6].replace("{w}",B)),await s(2600),b++}}V()}var M=t=>String(t).replace(/[&<>"]/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[e]),N=["12s ago","41s ago","1m ago","2m ago","4m ago","6m ago","9m ago","13m ago","21m ago","34m ago"],ct=[{k:"claude",g:"✳"},{k:"gpt",g:"◎"},{k:"gemini",g:"✦"},{k:"grok",g:"⊘"},{k:"open",g:"❖"}],G=t=>t.p?x[t.p].price+x[t.p].ship:0,W=t=>t.p?Math.min(100,Math.round(t.cart/G(t)*100)):0;function lt(t){if(!t.p)return'<div class="mp mp-sleep"><span>window shopping…</span><small>wakes up when the next trade pays for compute</small></div>';let e=x[t.p];return`<div class="mp" style="--acc:${e.acc};--on:${e.on}"><div class="mp-head"><b>${M(e.store)}</b><span>shop · new · gifts</span><em>cart (<i>0</i>)</em></div><div class="mp-body"><img src="${e.img}" alt="${M(e.name)}" loading="lazy" decoding="async"><div class="mp-info"><span class="mp-name">${M(e.name)}</span><span class="mp-rate">★★★★★ ${e.reviews.toLocaleString("en-US")}</span><span class="mp-price">${k(e.price)}</span><span class="mp-add">add to cart</span></div></div></div>`}function dt(t,e){let i=q(t.m),a=t.p?x[t.p]:null,d=W(t),c=t.state==="asleep",l=a?a.domain+a.path:`${t.t.toLowerCase()} · not shopping yet`,h=a?`<img class="c-av" src="${a.img}" alt="" loading="lazy" decoding="async">`:'<span class="c-av c-av-z" aria-hidden="true">zz</span>';return`<article class="card${c?" is-asleep":""}" data-i="${e}" data-fam="${i.fam}">
+    <div class="c-bar"><span class="sq" aria-hidden="true">□□□</span><span class="c-url">${M(l)}</span>${c?'<span class="c-state c-sleep">ASLEEP</span>':'<span class="c-state c-live"><i></i>LIVE</span>'}</div>
+    <div class="c-view">${lt(t)}<span class="c-model"><i class="g-${i.fam}">${i.glyph}</i>${M(i.name)}</span><p class="c-thought" data-k="0"><span>${M(t.th[0])}</span></p></div>
+    <div class="c-body">
+      <div class="c-id">${h}<div><b>$${M(t.t)}</b><span>${M(t.name)} · ${M(t.cat)}</span></div></div>
+      <dl class="c-stats">
+        <div><dt>cart</dt><dd data-cart>${k(t.cart)}</dd></div>
+        <div><dt>bought</dt><dd>${t.bought} <span>· ${t.shipped} shipped</span></dd></div>
+        <div><dt>next buy</dt><dd>${a?k(a.price+a.ship):"—"}</dd></div>
+      </dl>
+      <div class="c-meter" aria-hidden="true"><i style="width:${d}%"></i></div>
+      <p class="c-foot"><span data-pct>${c?"asleep · waiting on compute":d+"% to checkout"}</span><span>${c?"traded 3h ago":"traded "+N[e%N.length]}</span></p>
+    </div>
+    <span class="c-wm" aria-hidden="true">${i.glyph}</span>
+  </article>`}function Y(){let t=document.getElementById("grid");if(!t)return;t.innerHTML=E.map(dt).join("");let e=[...t.querySelectorAll(".card")],i=document.getElementById("famTabs");if(i){let n=o=>E.filter(r=>q(r.m).fam===o).length;i.innerHTML=`<button type="button" data-fam-tab="all" aria-pressed="true">All <span>${E.length}</span></button>`+ct.map(o=>`<button type="button" data-fam-tab="${o.k}" aria-pressed="false" title="${o.k}"><i class="g-${o.k}">${o.g}</i> <span>${n(o.k)}</span></button>`).join("")}let a=document.getElementById("exSearch"),d=document.getElementById("exCount"),c=document.getElementById("shoppingBtn"),l="all",h=!1,m=()=>{let n=(a?.value||"").trim().toLowerCase(),o=0;e.forEach(p=>{let u=E[+p.dataset.i],y=q(u.m),v=`${u.t} ${u.name} ${u.cat} ${y.name} ${u.p?x[u.p].name+" "+x[u.p].store:""}`.toLowerCase(),C=(l==="all"||y.fam===l)&&(!n||v.includes(n))&&(!h||u.state==="shopping");p.hidden=!C,C&&o++}),d&&(d.textContent=`${o} of ${E.length}`);let r=document.getElementById("exEmpty");r&&(r.hidden=o>0)};a?.addEventListener("input",m),i?.addEventListener("click",n=>{let o=n.target.closest("[data-fam-tab]");o&&(l=o.dataset.famTab,i.querySelectorAll("[data-fam-tab]").forEach(r=>r.setAttribute("aria-pressed",String(r===o))),m())}),c?.addEventListener("click",()=>{h=!h,c.setAttribute("aria-pressed",String(h)),m()}),document.querySelectorAll("[data-sort]").forEach(n=>n.addEventListener("click",()=>{document.querySelectorAll("[data-sort]").forEach(p=>p.setAttribute("aria-pressed",String(p===n)));let o=n.dataset.sort;e.slice().sort((p,u)=>{let y=E[+p.dataset.i],v=E[+u.dataset.i];return o==="cart"?v.cart-y.cart:o==="bought"?v.bought-y.bought:+p.dataset.i-+u.dataset.i}).forEach(p=>t.appendChild(p))}));let $=document.getElementById("shoppingCount");if($&&($.textContent=E.filter(n=>n.state==="shopping").length),m(),window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;let s=!1;new IntersectionObserver(n=>{s=n.some(o=>o.isIntersecting)}).observe(t),setInterval(()=>{if(!s||document.hidden)return;let n=e.filter(v=>!v.classList.contains("is-asleep")&&!v.hidden);if(!n.length)return;let o=n[Math.floor(Math.random()*n.length)],r=E[+o.dataset.i],p=o.querySelector(".c-thought"),u=(+p.dataset.k+1)%r.th.length;p.dataset.k=u;let y=p.firstElementChild;if(y.classList.remove("in"),y.offsetWidth,y.textContent=r.th[u],y.classList.add("in"),Math.random()<.45){let v=o.querySelector(".mp-add");if(v){v.classList.add("flash"),v.textContent="added ✓";let C=o.querySelector(".mp-head i");C&&(C.textContent="1"),setTimeout(()=>{v.classList.remove("flash"),v.textContent="add to cart",C&&(C.textContent="0")},1100)}}if(r.p){r.cart=Math.min(G(r),r.cart+Math.random()*.6),o.querySelector("[data-cart]").textContent=k(r.cart);let v=W(r);o.querySelector(".c-meter i").style.width=v+"%",o.querySelector("[data-pct]").textContent=v+"% to checkout"}},1600)}var S=t=>String(t).replace(/[&<>"]/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[e]);function Q(){let t=document.getElementById("heroStats");if(t){let n=E.reduce((u,y)=>u+y.cart,0),o=E.filter(u=>u.state==="shopping").length,r=E.reduce((u,y)=>u+y.bought,0),p=E.reduce((u,y)=>u+y.shipped,0);t.innerHTML=`${E.length} coins · ${k(n)} in carts · ${o} shopping · ${r} bought · ${p} shipped <span class="demo">demonstration</span>`}let e=document.getElementById("recent"),i=document.getElementById("lately");if(e&&(e.innerHTML=D.slice(0,3).map(n=>`<li><a href="#receipts">$${S(n.t)}</a> <span class="mute">${S(n.when)} · ${S(x[n.p].short)} · ${S(q(n.m).name)}</span></li>`).join("")),i){let n=E.filter(y=>y.state==="shopping"),o=()=>{let y=n[Math.floor(Math.random()*n.length)],v=(Math.random()*.06+.002).toFixed(5);return{t:y.t,sol:v,born:Date.now()-Math.floor(Math.random()*9e3)}},r=[o(),o(),o()],p=()=>{i.innerHTML=r.map(y=>`<li><a href="#explore">$${S(y.t)}</a> <span>+${y.sol} SOL</span> <span class="mute">${Math.max(1,Math.round((Date.now()-y.born)/1e3))}s ago</span></li>`).join("")};p();let u=window.matchMedia("(prefers-reduced-motion: reduce)").matches;setInterval(()=>{document.hidden||(!u&&Math.random()<.4&&(r=[{...o(),born:Date.now()},...r.slice(0,2)]),p())},1500)}let a=document.getElementById("ledger");a&&(a.innerHTML=D.map(n=>{let o=x[n.p];return`<tr><td class="mute">${n.when}</td><td><a href="#explore">$${S(n.t)}</a></td><td>${S(o.name)}</td><td class="mute">${S(o.domain)}</td><td class="num">${k(n.paid)}</td><td class="mute">${S(q(n.m).name)}</td><td class="why">“${S(n.why)}”</td><td class="mono-sm">${S(n.holder)}</td><td><span class="st st-${n.st.split(" ")[0]}">${S(n.st)}</span></td></tr>`}).join(""));let d=document.getElementById("launchForm");if(!d)return;let c=document.getElementById("lModel");c.innerHTML=z.map(n=>`<option value="${n.id}">${S(n.name)}</option>`).join("");let l=document.getElementById("lTastes");l.innerHTML=Object.keys(K).map(n=>`<button type="button" data-taste="${n}" aria-pressed="${n==="chaotic"}">${n}</button>`).join("");let h={t:document.getElementById("pvT"),n:document.getElementById("pvN"),m:document.getElementById("pvM"),wm:document.getElementById("pvWm"),taste:document.getElementById("pvTaste"),first:document.getElementById("pvFirst"),split:document.getElementById("pvSplit"),url:document.getElementById("pvUrl")},m={useful:"first stop: a store that sells good socks. boring wins long term.",cozy:"looking at lamps. something warm for whoever wins.",chaotic:"first stop: a store that sells 500 googly eyes. we will see.",gamer:"reading reviews of 9 keyboards. ignoring the rgb ones.",fancy:"saving up. not buying anything under $80."},$={useful:"lite.search/?q=socks+that+last",cozy:"lite.search/?q=warm+lamp+gift",chaotic:"lite.search/?q=500+googly+eyes",gamer:"lite.search/?q=quiet+75+keyboard",fancy:"lite.search/?q=one+nice+thing"},w="chaotic",s=()=>{let n=document.getElementById("lName").value.trim()||"Quack Club",o=(document.getElementById("lTicker").value||"DUCK").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,10)||"DUCK",r=q(c.value);h.t.textContent=`$${o}`,h.n.textContent=`${n} · ${w}`,h.m.innerHTML=`<i class="g-${r.fam}">${r.glyph}</i>${S(r.name)}`,h.wm.textContent=r.glyph,h.taste.textContent=K[w],h.first.textContent=m[w],h.url.textContent=$[w];let p=document.getElementById("pvQ");p&&(p.textContent=decodeURIComponent($[w].split("q=")[1]||"").replace(/\+/g," "));let u=d.querySelector('input[name="budget"]:checked')?.value||"often";h.split.textContent=u==="often"?"small things, often":"one big thing"};l.addEventListener("click",n=>{let o=n.target.closest("[data-taste]");o&&(w=o.dataset.taste,l.querySelectorAll("button").forEach(r=>r.setAttribute("aria-pressed",String(r===o))),s())}),d.addEventListener("input",s),d.addEventListener("change",s),d.addEventListener("submit",n=>{n.preventDefault();let o=document.getElementById("lNote");o.textContent="launching opens when the pad goes live. this is a preview of the form."}),s()}var R=window.CART_CFG||{},H=(t,e)=>{try{e()}catch(i){console.error(t,i)}};H("ui",()=>{let t=(R.CA||"").trim(),e=R.BUY||(t?`https://pump.fun/coin/${t}`:""),i=R.CHART||(t?`https://gmgn.ai/sol/token/${t}`:"");document.querySelectorAll("[data-buy]").forEach(a=>{e?(a.href=e,a.target="_blank",a.rel="noopener"):(a.removeAttribute("href"),a.setAttribute("aria-disabled","true"),a.title="CA drops at launch")}),document.querySelectorAll("[data-chart]").forEach(a=>{i?(a.href=i,a.target="_blank",a.rel="noopener"):(a.removeAttribute("href"),a.setAttribute("aria-disabled","true"))}),document.querySelectorAll("[data-x]").forEach(a=>{R.X?(a.href=R.X,a.target="_blank",a.rel="noopener"):(a.removeAttribute("href"),a.setAttribute("aria-disabled","true"))}),document.querySelectorAll("[data-ca]").forEach(a=>{a.textContent=t||"ca drops at launch",t&&(a.classList.add("has-ca"),a.addEventListener("click",async()=>{try{await navigator.clipboard.writeText(t),a.textContent="copied",setTimeout(()=>{a.textContent=t},1200)}catch{let c=document.createRange();c.selectNodeContents(a);let l=window.getSelection();l.removeAllRanges(),l.addRange(c)}}))})});H("art",O);H("live",F);H("cards",Y);H("feeds",Q);})();
+</script>
+</body>
+</html>
